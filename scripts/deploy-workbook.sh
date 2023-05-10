@@ -21,7 +21,7 @@ help() {
   exit 1
 }
 
-while getopts :s:g:t:cl:b: OPT
+while getopts :s:g:t:cl:b:d OPT
 do
   case $OPT in
     s) subscription_id=$OPTARG
@@ -35,6 +35,8 @@ do
     l) location=$OPTARG
        ;;
     b) base_url=$OPTARG
+       ;;
+    d) developer_mode=1
        ;;
     *) help
        ;;
@@ -77,6 +79,13 @@ if [ $? -ne 0 ]; then
         az group create --name $resource_group_name --subscription $subscription_id --location $location
         [ $? -ne 0 ] && error "Please input correct SubscriptionID and Resource Group name"
     fi
+fi
+
+if [ x$developer_mode != x"" ]; then
+    log "Developer mode is enabled. Deploy Advisor version."
+    wget $base_url/workbooks/ReliabilityWorkbookPublic.workbook
+    az deployment group create -g $resource_group_name --template-uri $base_url/workbooks/azuredeploy.json --parameters name="FTA - Reliability Workbook - Advisor version" serializedData=@ReliabilityWorkbookPublic.workbook
+    exit 0
 fi
 
 # Download file list
