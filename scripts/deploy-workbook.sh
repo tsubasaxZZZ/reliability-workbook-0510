@@ -80,14 +80,17 @@ if [ $? -ne 0 ]; then
 fi
 
 # Download file list
-[ ! -f workbook_filelist ] && wget $base_url/artifacts/workbook_filelist
+[ ! -f workbook_filelist ] && wget $base_url/workbooks/workbook_filelist
 cat workbook_filelist | while read f
 do
     log "Download workbook file: $f"
     if [ -f $f ]; then
         log "Skip download because the file already exists"
     else
-        wget $base_url/artifacts/$f
+        wget $base_url/workbooks/$f
+        if [ $? -ne 0 ]; then
+            error "Failed to download $f"
+        fi
     fi
 done
 
@@ -97,7 +100,7 @@ do
   filename_base=`basename $f .workbook`
   filename=`basename $f`
   log "Deploy ${filename_base}"
-  { az deployment group create --name $filename_base -g $resource_group_name --template-uri $base_url/artifacts/azuredeploy.json --parameters serializedData=@$filename --parameters name=$filename_base --query 'properties.outputs.resource_id.value' -o json; } > ${filename_base}_id &
+  { az deployment group create --name $filename_base -g $resource_group_name --template-uri $base_url/workbooks/azuredeploy.json --parameters serializedData=@$filename --parameters name=$filename_base --query 'properties.outputs.resource_id.value' -o json; } > ${filename_base}_id &
 done
 
 # Wait for all deployment processes
@@ -238,5 +241,5 @@ escaped_replacement_text=$(printf '%s\n' "$tab_of_Export" | sed 's:[\/&]:\\&:g;$
 sed -i "s/\${tab_of_Export}/$escaped_replacement_text/g" workbook.tpl.json
 
 log "Deploy FTA - Reliability Workbook"
-az deployment group create -g $resource_group_name --template-uri $base_url/artifacts/azuredeploy.json --parameters name="FTA - Reliability Workbook" serializedData=@workbook.tpl.json
+az deployment group create -g $resource_group_name --template-uri $base_url/workbooks/azuredeploy.json --parameters name="FTA - Reliability Workbook" serializedData=@workbook.tpl.json
 \rm *_id

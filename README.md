@@ -8,7 +8,11 @@ This Reliability Workbook consists of several co-workbooks. For easy deployment,
 
 ### Usage
 
+Simply download the deploy script and use it. You don't need to clone this repository.
+
 ```shell
+$ wget https://raw.githubusercontent.com/Azure/reliability-workbook/scripts/deploy-workbook.sh
+$ chmod +x deploy-workbook.sh
 $ ./deploy-workbook.sh 
 Usage: ./deploy-workbook.sh -s <Subscription ID> -g <Resource Group> [-t <Tenant ID>] [-c Create Resource Group if not exist] [-l <location>] [-b <Base URL of Workbook>]
 Example 1: When you want to deploy workbook to resource group myResourceGroup in subscription
