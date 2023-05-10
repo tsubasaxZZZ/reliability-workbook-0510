@@ -37,3 +37,4 @@ build-bicep: ## Build Bicep files
 clean: ## Remove generated files
 	rm -f tfplan
 	rm -rf ./artifacts/
+
